@@ -1,5 +1,3 @@
--- AlterTable: Add numeroFrota column to Veiculo
-ALTER TABLE "Veiculo" ADD COLUMN "numeroFrota" TEXT;
-
--- CreateIndex
-CREATE UNIQUE INDEX "Veiculo_numeroFrota_key" ON "Veiculo"("numeroFrota");
+-- Migration corrigida: numeroFrota ja foi adicionado em 20260425041813_add_numero_frota
+-- Este arquivo e mantido apenas para preservar o historico de migracoes locais
+SELECT 1; -- no-op
