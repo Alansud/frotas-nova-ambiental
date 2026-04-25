@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --brand-blue: #0056A6;
+  --brand-blue-dark: #003d7a;
+  --brand-blue-light: #e8f1fb;
+  --brand-green: #00A651;
+  --brand-green-dark: #007a3d;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-dark: var(--brand-blue-dark);
+  --color-brand-blue-light: var(--brand-blue-light);
+  --color-brand-green: var(--brand-green);
+  --color-brand-green-dark: var(--brand-green-dark);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ── Print: mostra apenas o layout do QR Code ──────────────────────────── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .frota-print-layout {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    visibility: visible;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    padding: 2rem;
+  }
+
+  .frota-print-layout * {
+    visibility: visible;
+  }
+}

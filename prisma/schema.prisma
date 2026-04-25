@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Veiculo {
+  id             String          @id @default(cuid())
+  numeroFrota    String          @unique
+  placa          String          @unique
+  modelo         String
+  marca          String
+  ano            Int
+  cor            String?
+  renavam        String?
+  chassi         String?
+  fotoUrl        String?
+  kmAtual        Int             @default(0)
+  ativo          Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  manutencoes    Manutencao[]
+  proximaRevisao ProximaRevisao?
+}
+
+model Manutencao {
+  id          String   @id @default(cuid())
+  veiculoId   String
+  veiculo     Veiculo  @relation(fields: [veiculoId], references: [id], onDelete: Cascade)
+  data        DateTime
+  kmNaData    Int
+  mecanico    String
+  servicos    String
+  observacoes String?
+  custo       Float?
+  createdAt   DateTime @default(now())
+}
+
+model ProximaRevisao {
+  id           String    @id @default(cuid())
+  veiculoId    String    @unique
+  veiculo      Veiculo   @relation(fields: [veiculoId], references: [id], onDelete: Cascade)
+  kmPrevisto   Int
+  dataPrevista DateTime?
+  observacoes  String?
+  updatedAt    DateTime  @updatedAt
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+}
