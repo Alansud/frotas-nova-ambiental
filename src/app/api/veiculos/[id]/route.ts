@@ -27,7 +27,7 @@ export async function PUT(
 
   const { id } = await params
   const body = await req.json()
-  const { numeroFrota, placa, modelo, marca, ano, cor, renavam, chassi, fotoUrl, kmAtual, proximaRevisao } = body
+  const { numeroFrota, placa, modelo, marca, ano, cor, renavam, chassi, fotoUrl, kmAtual, tipoMedicao, proximaRevisao } = body
 
   const veiculo = await prisma.veiculo.update({
     where: { id },
@@ -42,6 +42,7 @@ export async function PUT(
       chassi,
       fotoUrl,
       kmAtual: kmAtual !== undefined ? Number(kmAtual) : undefined,
+      ...(tipoMedicao !== undefined && { tipoMedicao: tipoMedicao === 'hora' ? 'hora' : 'km' }),
     },
   })
 

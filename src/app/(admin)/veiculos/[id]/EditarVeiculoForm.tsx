@@ -15,6 +15,9 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
   const [error, setError] = useState('')
   const [fotoUrl, setFotoUrl] = useState(veiculo.fotoUrl || '')
   const [fotoPreview, setFotoPreview] = useState(veiculo.fotoUrl || '')
+  const [tipoMedicao, setTipoMedicao] = useState<'km' | 'hora'>(
+    (veiculo.tipoMedicao as 'km' | 'hora') ?? 'km'
+  )
 
   async function handleFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -43,6 +46,7 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
       renavam: fd.get('renavam'),
       chassi: fd.get('chassi'),
       kmAtual: fd.get('kmAtual'),
+      tipoMedicao,
       fotoUrl,
       proximaRevisao: {
         kmPrevisto: fd.get('kmPrevisto'),
@@ -77,6 +81,7 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
   const dataPrevistaValue = pr?.dataPrevista
     ? new Date(pr.dataPrevista).toISOString().split('T')[0]
     : ''
+  const isHora = tipoMedicao === 'hora'
 
   return (
     <>
@@ -115,10 +120,16 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
                     <div className="w-full h-full flex items-center justify-center text-gray-300 text-xs">Sem foto</div>
                   )}
                 </div>
-                <label className="cursor-pointer text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px] flex items-center">
-                  📷 Trocar foto
-                  <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFoto} />
-                </label>
+                <div className="flex gap-2">
+                  <label className="cursor-pointer text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px] flex items-center">
+                    📷 Câmera
+                    <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFoto} />
+                  </label>
+                  <label className="cursor-pointer text-sm font-medium px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px] flex items-center">
+                    🖼️ Galeria
+                    <input type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+                  </label>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -128,7 +139,26 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
                 <FField label="Marca *" name="marca" defaultValue={veiculo.marca} required />
                 <FField label="Ano *" name="ano" type="number" defaultValue={String(veiculo.ano)} required />
                 <FField label="Cor" name="cor" defaultValue={veiculo.cor || ''} />
-                <FField label="KM Atual" name="kmAtual" type="number" defaultValue={String(veiculo.kmAtual)} />
+
+                {/* Tipo de Medicao */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Tipo de Medição</label>
+                  <select
+                    value={tipoMedicao}
+                    onChange={(e) => setTipoMedicao(e.target.value as 'km' | 'hora')}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  >
+                    <option value="km">KM</option>
+                    <option value="hora">Horímetro (h)</option>
+                  </select>
+                </div>
+
+                <FField
+                  label={isHora ? 'Horímetro Atual (h)' : 'KM Atual'}
+                  name="kmAtual"
+                  type="number"
+                  defaultValue={String(veiculo.kmAtual)}
+                />
                 <FField label="RENAVAM" name="renavam" defaultValue={veiculo.renavam || ''} />
                 <FField label="Chassi" name="chassi" defaultValue={veiculo.chassi || ''} />
               </div>
@@ -136,7 +166,12 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
               <div className="border-t border-gray-100 pt-4">
                 <p className="text-sm font-semibold text-gray-700 mb-3">Próxima Revisão</p>
                 <div className="grid grid-cols-2 gap-3">
-                  <FField label="KM Previsto" name="kmPrevisto" type="number" defaultValue={String(pr?.kmPrevisto || '')} />
+                  <FField
+                    label={isHora ? 'Horímetro Previsto (h)' : 'KM Previsto'}
+                    name="kmPrevisto"
+                    type="number"
+                    defaultValue={String(pr?.kmPrevisto || '')}
+                  />
                   <FField label="Data Prevista" name="dataPrevista" type="date" defaultValue={dataPrevistaValue} />
                   <div className="col-span-2">
                     <label className="block text-xs font-medium text-gray-600 mb-1">Observações</label>

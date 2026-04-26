@@ -6,6 +6,7 @@ import ReviewAlertToast from '@/components/admin/ReviewAlertToast'
 import AlertToast from '@/components/AlertToast'
 import NavbarAdmin from '@/components/admin/NavbarAdmin'
 import Footer from '@/components/Footer'
+import PushNotifications from '@/components/PushNotifications'
 
 export default async function AdminLayout({
   children,
@@ -37,6 +38,7 @@ export default async function AdminLayout({
         proximas={notificacoes.proximas}
       />
       <AlertToast />
+      <PushNotifications />
       <NavbarAdmin />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {children}

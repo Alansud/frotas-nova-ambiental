@@ -31,6 +31,11 @@ export default async function ManutencaoPage({
         <h1 className="text-xl font-bold text-gray-900">Registrar Manutenção</h1>
         <p className="text-sm text-gray-500 mt-1">
           Frota {veiculo.numeroFrota} — {veiculo.placa} · {veiculo.marca} {veiculo.modelo}
+          {veiculo.tipoMedicao === 'hora' && (
+            <span className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+              Horímetro
+            </span>
+          )}
         </p>
       </div>
 
@@ -43,6 +48,7 @@ export default async function ManutencaoPage({
             ? new Date(veiculo.proximaRevisao.dataPrevista).toISOString().split('T')[0]
             : null
         }
+        tipoMedicao={veiculo.tipoMedicao}
       />
     </div>
   )

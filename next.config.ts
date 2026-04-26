@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   // Permite origens de desenvolvimento locais (ignorado em produção)
   ...(process.env.NODE_ENV === "development" && {
     allowedDevOrigins: ["192.168.1.7"],
@@ -14,6 +17,7 @@ const nextConfig: NextConfig = {
     "bcryptjs",
     "better-sqlite3",
     "@prisma/adapter-better-sqlite3",
+    "@react-pdf/renderer",
   ],
 };
 

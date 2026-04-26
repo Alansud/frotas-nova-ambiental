@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import {
   calcularStatusRevisao, statusLabel, statusColor,
-  formatDate, formatKm
+  formatDate, formatMedicao
 } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -25,10 +25,10 @@ export default async function VeiculoDetailPage({
   if (!veiculo) notFound()
 
   const status = calcularStatusRevisao(veiculo)
+  const isHora = veiculo.tipoMedicao === 'hora'
 
   return (
     <>
-      {/* Marca d'água: foto do veículo como background fullscreen */}
       {veiculo.fotoUrl && (
         <div className="fixed inset-0 z-[-1] overflow-hidden">
           <Image
@@ -50,9 +50,16 @@ export default async function VeiculoDetailPage({
             <h1 className="text-2xl font-bold text-gray-900 mt-1">
               Frota {veiculo.numeroFrota} — {veiculo.modelo}
             </h1>
-            <p className="text-gray-500 text-sm">{veiculo.placa} · {veiculo.marca} · {veiculo.ano}</p>
+            <p className="text-gray-500 text-sm">
+              {veiculo.placa} · {veiculo.marca} · {veiculo.ano}
+              {isHora && (
+                <span className="ml-2 text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                  Horímetro
+                </span>
+              )}
+            </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Link
               href={`/veiculos/${veiculo.id}/manutencao`}
               className="text-white text-sm font-semibold px-4 py-3 rounded-lg min-h-[44px] flex items-center"
@@ -60,11 +67,19 @@ export default async function VeiculoDetailPage({
             >
               + Manutenção
             </Link>
+            <a
+              href={`/api/veiculos/${veiculo.id}/pdf`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold px-4 py-3 rounded-lg min-h-[44px] flex items-center border"
+              style={{ borderColor: '#0056A6', color: '#0056A6' }}
+            >
+              ↓ PDF
+            </a>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Foto */}
           <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
             <div className="relative h-48 bg-gray-100">
               {veiculo.fotoUrl ? (
@@ -78,14 +93,16 @@ export default async function VeiculoDetailPage({
             <div className="p-4 space-y-1 text-sm">
               <p><span className="text-gray-500">Frota:</span> <strong>{veiculo.numeroFrota}</strong></p>
               <p><span className="text-gray-500">Placa:</span> <strong>{veiculo.placa}</strong></p>
-              <p><span className="text-gray-500">KM Atual:</span> <strong>{formatKm(veiculo.kmAtual)}</strong></p>
+              <p>
+                <span className="text-gray-500">{isHora ? 'Horímetro:' : 'KM Atual:'}</span>{' '}
+                <strong>{formatMedicao(veiculo.kmAtual, veiculo.tipoMedicao)}</strong>
+              </p>
               {veiculo.cor && <p><span className="text-gray-500">Cor:</span> {veiculo.cor}</p>}
               {veiculo.renavam && <p><span className="text-gray-500">RENAVAM:</span> {veiculo.renavam}</p>}
               {veiculo.chassi && <p><span className="text-gray-500">Chassi:</span> {veiculo.chassi}</p>}
             </div>
           </div>
 
-          {/* Status revisao */}
           <div className="bg-white rounded-xl border border-gray-100 p-5 lg:col-span-2">
             <div className="flex items-center justify-between mb-3">
               <h2 className="font-semibold text-gray-900">Próxima Revisão</h2>
@@ -95,7 +112,10 @@ export default async function VeiculoDetailPage({
             </div>
             {veiculo.proximaRevisao ? (
               <div className="space-y-2 text-sm">
-                <p><span className="text-gray-500">KM previsto:</span> <strong>{formatKm(veiculo.proximaRevisao.kmPrevisto)}</strong></p>
+                <p>
+                  <span className="text-gray-500">{isHora ? 'Horímetro previsto:' : 'KM previsto:'}</span>{' '}
+                  <strong>{formatMedicao(veiculo.proximaRevisao.kmPrevisto, veiculo.tipoMedicao)}</strong>
+                </p>
                 <p><span className="text-gray-500">Data prevista:</span> <strong>{formatDate(veiculo.proximaRevisao.dataPrevista)}</strong></p>
                 {veiculo.proximaRevisao.observacoes && (
                   <p><span className="text-gray-500">Obs:</span> {veiculo.proximaRevisao.observacoes}</p>
@@ -114,18 +134,18 @@ export default async function VeiculoDetailPage({
             ) : (
               <p className="text-gray-400 text-sm">Nenhuma revisão agendada.</p>
             )}
-
             <div className="mt-4 pt-4 border-t border-gray-50">
               <EditarVeiculoForm veiculo={veiculo} />
             </div>
           </div>
         </div>
 
-        {/* Historico de manutencoes */}
         <div className="bg-white rounded-xl border border-gray-100 p-6">
-          <h2 className="font-semibold text-gray-900 mb-4">
-            Histórico de Manutenções ({veiculo.manutencoes.length})
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-gray-900">
+              Histórico de Manutenções ({veiculo.manutencoes.length})
+            </h2>
+          </div>
           {veiculo.manutencoes.length === 0 ? (
             <p className="text-gray-400 text-sm">Nenhuma manutenção registrada.</p>
           ) : (
@@ -134,13 +154,13 @@ export default async function VeiculoDetailPage({
                 <div key={m.id} className="border-l-4 pl-4 py-2" style={{ borderColor: '#0056A6' }}>
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">{formatDate(m.data)} · {formatKm(m.kmNaData)}</p>
+                      <p className="font-semibold text-gray-900 text-sm">
+                        {formatDate(m.data)} · {formatMedicao(m.kmNaData, veiculo.tipoMedicao)}
+                      </p>
                       <p className="text-xs text-gray-500">Mecânico: {m.mecanico}</p>
                     </div>
                     {m.custo && (
-                      <span className="text-xs text-gray-500 font-medium">
-                        R$ {m.custo.toFixed(2)}
-                      </span>
+                      <span className="text-xs text-gray-500 font-medium">R$ {m.custo.toFixed(2)}</span>
                     )}
                   </div>
                   <p className="text-sm text-gray-700 mt-1">{m.servicos}</p>

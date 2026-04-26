@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma'
-import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatKm } from '@/types'
+import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatMedicao } from '@/types'
 import Link from 'next/link'
 import FrotaQRCodeModal from '../veiculos/FrotaQRCodeModal'
+import DashboardCharts from '@/components/DashboardCharts'
 
 export default async function DashboardPage() {
   const veiculos = await prisma.veiculo.findMany({
@@ -31,7 +32,6 @@ export default async function DashboardPage() {
       return s === 'vencida' || s === 'atencao'
     })
     .sort((a, b) => {
-      // Vencidas primeiro
       const sa = calcularStatusRevisao(a)
       const sb = calcularStatusRevisao(b)
       if (sa === 'vencida' && sb !== 'vencida') return -1
@@ -39,9 +39,54 @@ export default async function DashboardPage() {
       return 0
     })
 
+  // --- Dados para gráficos ---
+
+  // Gastos mensais (últimos 6 meses)
+  const gastosMensais = await Promise.all(
+    Array.from({ length: 6 }, (_, i) => {
+      const d = new Date(agora.getFullYear(), agora.getMonth() - (5 - i), 1)
+      const inicio = new Date(d.getFullYear(), d.getMonth(), 1)
+      const fim = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59)
+      const mes = d.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })
+      return prisma.manutencao
+        .findMany({ where: { data: { gte: inicio, lte: fim } }, select: { custo: true } })
+        .then(ms => ({
+          mes,
+          total: parseFloat(ms.reduce((s, m) => s + (m.custo ?? 0), 0).toFixed(2)),
+          count: ms.length,
+        }))
+    })
+  )
+
+  // Tipos de serviço por categoria (parse de palavras-chave)
+  const todasManutencoes = await prisma.manutencao.findMany({ select: { servicos: true } })
+  const categorias: Record<string, number> = {
+    'Óleo/Filtros': 0,
+    'Freios': 0,
+    'Pneus': 0,
+    'Elétrica': 0,
+    'Outros': 0,
+  }
+  for (const m of todasManutencoes) {
+    const s = m.servicos.toLowerCase()
+    if (s.includes('óleo') || s.includes('oleo') || s.includes('filtro')) {
+      categorias['Óleo/Filtros']++
+    } else if (s.includes('freio') || s.includes('pastil') || s.includes('disco')) {
+      categorias['Freios']++
+    } else if (s.includes('pneu') || s.includes('borracha') || s.includes('estepe')) {
+      categorias['Pneus']++
+    } else if (s.includes('bateria') || s.includes('elétric') || s.includes('eletric') || s.includes('alternador')) {
+      categorias['Elétrica']++
+    } else {
+      categorias['Outros']++
+    }
+  }
+  const tiposServico = Object.entries(categorias)
+    .filter(([, v]) => v > 0)
+    .map(([nome, value]) => ({ nome, value }))
+
   return (
     <div>
-
       <div className="mb-8">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
@@ -67,6 +112,19 @@ export default async function DashboardPage() {
           <p className="text-3xl font-bold mt-1" style={{ color: '#00A651' }}>{manutencoesEsseMes}</p>
         </div>
         <div className={`rounded-xl shadow-sm p-5 ${
+          alertaTotal > 0 ? 'bg-yellow-50 border border-yellow-200' : 'bg-white border border-gray-100'
+        }`}>
+          <p className="text-sm text-gray-500 font-medium">Atenção necessária</p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className={`text-3xl font-bold ${alertaTotal > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
+              {alertaTotal}
+            </p>
+            {alertaTotal > 0 && (
+              <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">Revisar</span>
+            )}
+          </div>
+        </div>
+        <div className={`rounded-xl shadow-sm p-5 ${
           statusCounts.vencida > 0 ? 'bg-red-50 border border-red-200' : 'bg-white border border-gray-100'
         }`}>
           <p className="text-sm text-gray-500 font-medium">Revisões vencidas</p>
@@ -76,19 +134,6 @@ export default async function DashboardPage() {
             </p>
             {statusCounts.vencida > 0 && (
               <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-semibold">Urgente</span>
-            )}
-          </div>
-        </div>
-        <div className={`rounded-xl shadow-sm p-5 ${
-          statusCounts.atencao > 0 ? 'bg-yellow-50 border border-yellow-200' : 'bg-white border border-gray-100'
-        }`}>
-          <p className="text-sm text-gray-500 font-medium">Atenção necessária</p>
-          <div className="flex items-center gap-2 mt-1">
-            <p className={`text-3xl font-bold ${statusCounts.atencao > 0 ? 'text-yellow-600' : 'text-gray-900'}`}>
-              {statusCounts.atencao}
-            </p>
-            {statusCounts.atencao > 0 && (
-              <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">Alerta</span>
             )}
           </div>
         </div>
@@ -113,6 +158,9 @@ export default async function DashboardPage() {
         <FrotaQRCodeModal />
       </div>
 
+      {/* Gráficos */}
+      <DashboardCharts gastosMensais={gastosMensais} tiposServico={tiposServico} />
+
       {/* Veiculos com alerta */}
       {veiculosAlerta.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -133,9 +181,10 @@ export default async function DashboardPage() {
                 }`}>
                   <div>
                     <p className="font-semibold text-gray-900">Frota {v.numeroFrota} — {v.modelo}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{v.placa} · KM: {formatKm(v.kmAtual)}
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {v.placa} · {formatMedicao(v.kmAtual, v.tipoMedicao)}
                       {v.proximaRevisao && (
-                        <> · Revisão: {formatKm(v.proximaRevisao.kmPrevisto)}
+                        <> · Revisão: {formatMedicao(v.proximaRevisao.kmPrevisto, v.tipoMedicao)}
                           {v.proximaRevisao.dataPrevista && <> · {formatDate(v.proximaRevisao.dataPrevista)}</>}
                         </>
                       )}

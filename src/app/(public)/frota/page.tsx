@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import FrotaListaClient from './FrotaListaClient'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata = {
   title: 'Frota Nova Ambiental — Consulta de Revisões',
 }

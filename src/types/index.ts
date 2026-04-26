@@ -53,3 +53,10 @@ export function formatDate(date: Date | string | null | undefined): string {
 export function formatKm(km: number): string {
   return km.toLocaleString('pt-BR') + ' km'
 }
+
+export function formatMedicao(value: number, tipoMedicao?: string | null): string {
+  if (tipoMedicao === 'hora') {
+    return value.toLocaleString('pt-BR') + ' h'
+  }
+  return value.toLocaleString('pt-BR') + ' km'
+}

@@ -10,7 +10,6 @@ export default function Footer() {
         height={40}
         className="opacity-40 object-contain"
       />
-      <span className="text-xs text-gray-400">Oficina Nova Ambiental</span>
     </footer>
   )
 }

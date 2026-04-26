@@ -9,6 +9,7 @@ export default function NovoVeiculoPage() {
   const [error, setError] = useState('')
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
   const [fotoUrl, setFotoUrl] = useState('')
+  const [tipoMedicao, setTipoMedicao] = useState<'km' | 'hora'>('km')
 
   async function handleFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -38,6 +39,7 @@ export default function NovoVeiculoPage() {
       renavam: fd.get('renavam'),
       chassi: fd.get('chassi'),
       kmAtual: fd.get('kmAtual'),
+      tipoMedicao,
       fotoUrl,
       proximaRevisao: {
         kmPrevisto: fd.get('kmPrevisto'),
@@ -62,6 +64,8 @@ export default function NovoVeiculoPage() {
     setLoading(false)
   }
 
+  const isHora = tipoMedicao === 'hora'
+
   return (
     <div className="max-w-2xl mx-auto px-1">
       <div className="mb-6">
@@ -84,18 +88,31 @@ export default function NovoVeiculoPage() {
                 <span className="text-gray-300 text-xs text-center px-2">Sem foto</span>
               )}
             </div>
-            <label className="cursor-pointer">
-              <span className="inline-block text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
-                📷 Câmera / Galeria
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={handleFoto}
-              />
-            </label>
+            <div className="flex gap-2">
+              <label className="cursor-pointer">
+                <span className="inline-flex items-center text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
+                  📷 Câmera
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={handleFoto}
+                />
+              </label>
+              <label className="cursor-pointer">
+                <span className="inline-flex items-center text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
+                  🖼️ Galeria
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFoto}
+                />
+              </label>
+            </div>
           </div>
         </div>
 
@@ -109,7 +126,26 @@ export default function NovoVeiculoPage() {
             <Field label="Marca *" name="marca" placeholder="Mercedes-Benz" required />
             <Field label="Ano *" name="ano" type="number" placeholder="2022" required />
             <Field label="Cor" name="cor" placeholder="Branco" />
-            <Field label="KM Atual" name="kmAtual" type="number" placeholder="0" />
+
+            {/* Tipo de Medicao */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Medição *</label>
+              <select
+                value={tipoMedicao}
+                onChange={(e) => setTipoMedicao(e.target.value as 'km' | 'hora')}
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="km">Quilometragem (KM)</option>
+                <option value="hora">Horímetro (Horas)</option>
+              </select>
+            </div>
+
+            <Field
+              label={isHora ? 'Horímetro Atual (h)' : 'KM Atual'}
+              name="kmAtual"
+              type="number"
+              placeholder={isHora ? 'Ex: 1250' : '0'}
+            />
             <Field label="RENAVAM" name="renavam" placeholder="00000000000" />
             <div className="sm:col-span-2">
               <Field label="Chassi" name="chassi" placeholder="9BW..." />
@@ -121,7 +157,12 @@ export default function NovoVeiculoPage() {
         <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Próxima Revisão</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="KM Previsto" name="kmPrevisto" type="number" placeholder="50000" />
+            <Field
+              label={isHora ? 'Horímetro Previsto (h)' : 'KM Previsto'}
+              name="kmPrevisto"
+              type="number"
+              placeholder={isHora ? '2000' : '50000'}
+            />
             <Field label="Data Prevista" name="dataPrevista" type="date" />
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Observações</label>

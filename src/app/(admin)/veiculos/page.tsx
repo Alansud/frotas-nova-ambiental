@@ -49,7 +49,7 @@ export default async function VeiculosPage() {
               <Link
                 key={v.id}
                 href={`/veiculos/${v.id}`}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow overflow-hidden border border-gray-100"
               >
                 <div className="relative h-40 bg-gray-100">
                   {v.fotoUrl ? (
