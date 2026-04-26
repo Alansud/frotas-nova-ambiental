@@ -18,15 +18,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Tipo de arquivo não permitido' }, { status: 400 })
   }
 
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
+  try {
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
 
-  const base64 = `data:${file.type};base64,${buffer.toString('base64')}`
+    const base64 = `data:${file.type};base64,${buffer.toString('base64')}`
 
-  const result = await cloudinary.uploader.upload(base64, {
-    folder: 'frotas-nova-ambiental',
-    resource_type: 'image',
-  })
+    const result = await cloudinary.uploader.upload(base64, {
+      folder: 'frotas-nova-ambiental',
+      resource_type: 'image',
+    })
 
-  return NextResponse.json({ url: result.secure_url })
+    return NextResponse.json({ url: result.secure_url })
+  } catch (error: unknown) {
+    console.error('Upload error:', error)
+    const message = error instanceof Error ? error.message : 'Erro no upload'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }
