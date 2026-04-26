@@ -9,7 +9,12 @@ const nextConfig: NextConfig = {
     allowedDevOrigins: ["192.168.1.7"],
   }),
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+    ],
   },
   // Módulos nativos precisam ser tratados como externos no servidor
   serverExternalPackages: [
