@@ -14,9 +14,9 @@ const nextConfig: NextConfig = {
   // Módulos nativos precisam ser tratados como externos no servidor
   serverExternalPackages: [
     "@prisma/client",
+    "@prisma/adapter-pg",
+    "pg",
     "bcryptjs",
-    "better-sqlite3",
-    "@prisma/adapter-better-sqlite3",
     "@react-pdf/renderer",
   ],
 };

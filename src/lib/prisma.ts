@@ -1,21 +1,30 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 import path from 'path'
-
-const dbUrl = process.env.DATABASE_URL ?? 'file:./prisma/dev.db'
-// Remove o prefixo "file:" para obter o caminho do arquivo
-const dbPath = dbUrl.replace(/^file:/, '')
-const resolvedPath = path.isAbsolute(dbPath)
-  ? dbPath
-  : path.join(process.cwd(), dbPath)
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
 function createPrismaClient() {
-  const adapter = new PrismaBetterSqlite3({ url: `file:${resolvedPath}` })
-  return new PrismaClient({ adapter } as ConstructorParameters<typeof PrismaClient>[0])
+  const databaseUrl = process.env.DATABASE_URL ?? 'file:./prisma/dev.db'
+
+  if (databaseUrl.startsWith('postgresql://') || databaseUrl.startsWith('postgres://')) {
+    // PostgreSQL adapter — produção (Render.com, etc.)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { PrismaPg } = require('@prisma/adapter-pg')
+    const adapter = new PrismaPg({ connectionString: databaseUrl })
+    return new PrismaClient({ adapter })
+  } else {
+    // SQLite adapter — desenvolvimento local
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3')
+    const dbPath = databaseUrl.replace(/^file:/, '')
+    const resolvedPath = path.isAbsolute(dbPath)
+      ? dbPath
+      : path.join(process.cwd(), dbPath)
+    const adapter = new PrismaBetterSqlite3({ url: `file:${resolvedPath}` })
+    return new PrismaClient({ adapter })
+  }
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient()
