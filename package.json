@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev --webpack --hostname 0.0.0.0",
-    "build": "prisma generate && prisma migrate deploy && ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts && next build --webpack",
+    "build": "prisma generate && prisma migrate deploy && node prisma/seed.js && next build --webpack",
     "start": "next start",
     "start:prod": "npm start",
     "lint": "eslint",
