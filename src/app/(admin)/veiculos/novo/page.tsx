@@ -11,6 +11,7 @@ export default function NovoVeiculoPage() {
   const [fotoUrl, setFotoUrl] = useState('')
   const [uploadingFoto, setUploadingFoto] = useState(false)
   const [tipoMedicao, setTipoMedicao] = useState<'km' | 'hora'>('km')
+  const [semPlaca, setSemPlaca] = useState(false)
 
   async function handleFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -46,7 +47,7 @@ export default function NovoVeiculoPage() {
     const fd = new FormData(e.currentTarget)
     const body = {
       numeroFrota: fd.get('numeroFrota'),
-      placa: fd.get('placa'),
+      placa: semPlaca ? 'NA' : fd.get('placa'),
       modelo: fd.get('modelo'),
       marca: fd.get('marca'),
       ano: fd.get('ano'),
@@ -150,7 +151,32 @@ export default function NovoVeiculoPage() {
           <h2 className="text-base font-semibold text-gray-900 mb-4">Informações do Veículo</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Número da Frota *" name="numeroFrota" placeholder="001" required />
-            <Field label="Placa *" name="placa" placeholder="ABC-1234" required />
+            
+            {/* Placa com opção "Sem placa" */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  {semPlaca ? 'Placa (Sem placa)' : 'Placa *'}
+                </label>
+                <label className="flex items-center gap-1 text-sm text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={semPlaca}
+                    onChange={(e) => setSemPlaca(e.target.checked)}
+                    className="rounded border-gray-300"
+                  />
+                  Sem placa
+                </label>
+              </div>
+              <input
+                name="placa"
+                type="text"
+                placeholder="ABC-1234"
+                required={!semPlaca}
+                disabled={semPlaca}
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              />
+            </div>
             <Field label="Modelo *" name="modelo" placeholder="Sprinter 415" required />
             <Field label="Marca *" name="marca" placeholder="Mercedes-Benz" required />
             <Field label="Ano *" name="ano" type="number" placeholder="2022" required />

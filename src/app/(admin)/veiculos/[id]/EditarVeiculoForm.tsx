@@ -18,6 +18,7 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
   const [tipoMedicao, setTipoMedicao] = useState<'km' | 'hora'>(
     (veiculo.tipoMedicao as 'km' | 'hora') ?? 'km'
   )
+  const [semPlaca, setSemPlaca] = useState(veiculo.placa === 'NA')
 
   async function handleFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -38,7 +39,7 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
     const fd = new FormData(e.currentTarget)
     const body = {
       numeroFrota: fd.get('numeroFrota'),
-      placa: fd.get('placa'),
+      placa: semPlaca ? 'NA' : fd.get('placa'),
       modelo: fd.get('modelo'),
       marca: fd.get('marca'),
       ano: fd.get('ano'),
@@ -134,7 +135,33 @@ export default function EditarVeiculoForm({ veiculo }: Props) {
 
               <div className="grid grid-cols-2 gap-3">
                 <FField label="Nº Frota *" name="numeroFrota" defaultValue={veiculo.numeroFrota} required />
-                <FField label="Placa *" name="placa" defaultValue={veiculo.placa} required />
+                
+                {/* Placa com opção "Sem placa" */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-gray-600">
+                      {semPlaca ? 'Placa (Sem placa)' : 'Placa *'}
+                    </label>
+                    <label className="flex items-center gap-1 text-xs text-gray-500 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={semPlaca}
+                        onChange={(e) => setSemPlaca(e.target.checked)}
+                        className="rounded border-gray-300"
+                      />
+                      Sem placa
+                    </label>
+                  </div>
+                  <input
+                    name="placa"
+                    type="text"
+                    defaultValue={veiculo.placa === 'NA' ? '' : veiculo.placa}
+                    required={!semPlaca}
+                    disabled={semPlaca}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-3 text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                  />
+                </div>
+                
                 <FField label="Modelo *" name="modelo" defaultValue={veiculo.modelo} required />
                 <FField label="Marca *" name="marca" defaultValue={veiculo.marca} required />
                 <FField label="Ano *" name="ano" type="number" defaultValue={String(veiculo.ano)} required />
