@@ -6,6 +6,13 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
 
+  // Debug: verificar se env vars estão configuradas
+  console.log('Cloudinary env check:', {
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 'OK' : 'MISSING',
+    api_key: process.env.CLOUDINARY_API_KEY ? 'OK' : 'MISSING',
+    api_secret: process.env.CLOUDINARY_API_SECRET ? 'OK' : 'MISSING',
+  })
+
   const formData = await req.formData()
   const file = formData.get('file') as File | null
 
