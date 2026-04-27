@@ -75,6 +75,6 @@ export async function DELETE(
   if (!session) return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
 
   const { id } = await params
-  await prisma.veiculo.update({ where: { id }, data: { ativo: false } })
+  await prisma.veiculo.delete({ where: { id } })
   return NextResponse.json({ ok: true })
 }
