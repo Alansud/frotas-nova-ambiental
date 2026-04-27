@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   // Módulos nativos precisam ser tratados como externos no servidor
   serverExternalPackages: [
