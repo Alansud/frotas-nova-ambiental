@@ -152,20 +152,20 @@ export default function NovoVeiculoPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Número da Frota *" name="numeroFrota" placeholder="001" required />
             
-            {/* Placa com opção "Sem placa" */}
-            <div>
-              <div className="flex items-center justify-between mb-1">
+            {/* Placa com opção "Sem placa" - V2 */}
+            <div className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+              <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700">
                   {semPlaca ? 'Placa (Sem placa)' : 'Placa *'}
                 </label>
-                <label className="flex items-center gap-1 text-sm text-gray-600 cursor-pointer">
+                <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer bg-white px-3 py-1 rounded border border-gray-300 hover:bg-gray-100">
                   <input
                     type="checkbox"
                     checked={semPlaca}
                     onChange={(e) => setSemPlaca(e.target.checked)}
-                    className="rounded border-gray-300"
+                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  Sem placa
+                  <span className="font-medium">Sem placa</span>
                 </label>
               </div>
               <input
@@ -174,8 +174,11 @@ export default function NovoVeiculoPage() {
                 placeholder="ABC-1234"
                 required={!semPlaca}
                 disabled={semPlaca}
-                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full border border-gray-300 rounded-lg px-3 py-3 text-base min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed"
               />
+              {semPlaca && (
+                <p className="text-xs text-gray-500 mt-1">Este veículo será cadastrado sem placa (máquina/linha amarela)</p>
+              )}
             </div>
             <Field label="Modelo *" name="modelo" placeholder="Sprinter 415" required />
             <Field label="Marca *" name="marca" placeholder="Mercedes-Benz" required />
