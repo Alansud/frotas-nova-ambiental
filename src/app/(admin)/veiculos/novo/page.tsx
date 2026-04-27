@@ -9,18 +9,33 @@ export default function NovoVeiculoPage() {
   const [error, setError] = useState('')
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
   const [fotoUrl, setFotoUrl] = useState('')
+  const [uploadingFoto, setUploadingFoto] = useState(false)
   const [tipoMedicao, setTipoMedicao] = useState<'km' | 'hora'>('km')
 
   async function handleFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    
+    setUploadingFoto(true)
     setFotoPreview(URL.createObjectURL(file))
 
     const form = new FormData()
     form.append('file', file)
-    const res = await fetch('/api/upload', { method: 'POST', body: form })
-    const data = await res.json()
-    if (data.url) setFotoUrl(data.url)
+    
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: form })
+      const data = await res.json()
+      if (data.url) {
+        setFotoUrl(data.url)
+        console.log('Foto enviada:', data.url.substring(0, 50) + '...')
+      } else {
+        setError('Erro ao enviar foto: ' + (data.error || 'desconhecido'))
+      }
+    } catch (err) {
+      setError('Erro de rede ao enviar foto')
+    } finally {
+      setUploadingFoto(false)
+    }
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -80,38 +95,52 @@ export default function NovoVeiculoPage() {
         <div className="bg-white rounded-xl border border-gray-100 p-4 sm:p-6">
           <h2 className="text-base font-semibold text-gray-900 mb-4">Foto do Veículo</h2>
           <div className="flex items-center gap-4">
-            <div className="w-32 h-24 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
+            <div className="w-32 h-24 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 relative">
               {fotoPreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={fotoPreview} alt="preview" className="w-full h-full object-cover" />
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={fotoPreview} alt="preview" className="w-full h-full object-cover" />
+                  {uploadingFoto && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                      <span className="text-white text-xs">Enviando...</span>
+                    </div>
+                  )}
+                </>
               ) : (
                 <span className="text-gray-300 text-xs text-center px-2">Sem foto</span>
               )}
             </div>
-            <div className="flex gap-2">
-              <label className="cursor-pointer">
-                <span className="inline-flex items-center text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
-                  📷 Câmera
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={handleFoto}
-                />
-              </label>
-              <label className="cursor-pointer">
-                <span className="inline-flex items-center text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
-                  🖼️ Galeria
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFoto}
-                />
-              </label>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <label className={`cursor-pointer ${uploadingFoto ? 'opacity-50' : ''}`}>
+                  <span className="inline-flex items-center text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
+                    📷 Câmera
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    className="hidden"
+                    onChange={handleFoto}
+                    disabled={uploadingFoto}
+                  />
+                </label>
+                <label className={`cursor-pointer ${uploadingFoto ? 'opacity-50' : ''}`}>
+                  <span className="inline-flex items-center text-sm font-medium px-4 py-3 rounded-lg border border-gray-300 hover:bg-gray-50 min-h-[44px]">
+                    🖼️ Galeria
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFoto}
+                    disabled={uploadingFoto}
+                  />
+                </label>
+              </div>
+              {fotoUrl && !uploadingFoto && (
+                <span className="text-green-600 text-xs">✓ Foto pronta</span>
+              )}
             </div>
           </div>
         </div>
@@ -183,11 +212,11 @@ export default function NovoVeiculoPage() {
         <div className="flex flex-col sm:flex-row gap-3 pb-4">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || uploadingFoto}
             className="text-white font-semibold px-6 py-3 rounded-lg disabled:opacity-60 min-h-[48px] text-base"
             style={{ background: '#0056A6' }}
           >
-            {loading ? 'Salvando...' : 'Cadastrar Veículo'}
+            {uploadingFoto ? 'Enviando foto...' : loading ? 'Salvando...' : 'Cadastrar Veículo'}
           </button>
           <button
             type="button"
