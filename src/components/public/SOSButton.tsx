@@ -1,5 +1,6 @@
 'use client'
 
+// Componente SOSButton - Versão 1.1
 import { useState, useRef, useCallback } from 'react'
 
 interface SOSButtonProps {
