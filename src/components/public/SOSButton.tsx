@@ -1,7 +1,7 @@
 'use client'
 
-// Componente SOSButton - Versão 1.1
-import { useState, useRef, useCallback } from 'react'
+// Componente SOSButton - Versão 1.2 - Debug
+import { useState, useRef, useCallback, useEffect } from 'react'
 
 interface SOSButtonProps {
   veiculoId?: string
@@ -14,6 +14,11 @@ interface LocationData {
 }
 
 export default function SOSButton({ veiculoId, veiculoNome }: SOSButtonProps) {
+  // Log para debug
+  useEffect(() => {
+    console.log('SOSButton renderizado', { veiculoId, veiculoNome })
+  }, [veiculoId, veiculoNome])
+
   const [isOpen, setIsOpen] = useState(false)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
   const [descricao, setDescricao] = useState('')
@@ -171,13 +176,14 @@ export default function SOSButton({ veiculoId, veiculoNome }: SOSButtonProps) {
       {/* Botão SOS Flutuante */}
       <button
         onClick={handleOpen}
-        className="fixed top-4 right-4 z-50 flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 min-h-[44px]"
+        className="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-4 rounded-full shadow-2xl transition-all hover:scale-110 active:scale-95 min-h-[56px] text-lg border-4 border-white"
         aria-label="SOS - Reportar problema"
+        style={{ boxShadow: '0 8px 32px rgba(220, 38, 38, 0.6)' }}
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <span className="text-sm">SOS</span>
+        <span>SOS</span>
       </button>
 
       {/* Modal */}
