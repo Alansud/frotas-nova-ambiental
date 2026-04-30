@@ -4,7 +4,7 @@
 import { useState, useRef, useCallback } from 'react'
 
 interface SOSButtonProps {
-  veiculoId: string
+  veiculoId?: string
   veiculoNome?: string
 }
 

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import Footer from '@/components/Footer'
+import SOSButton from '@/components/public/SOSButton'
 
 interface Veiculo {
   id: string
@@ -40,6 +41,9 @@ export default function FrotaListaClient({ veiculos }: Props) {
 
   return (
     <div className="min-h-screen" style={{ background: '#f0f4fa' }}>
+      {/* Botão SOS Geral */}
+      <SOSButton />
+
       {/* Header */}
       <div className="text-white py-6 px-4 shadow-md" style={{ background: '#0056A6' }}>
         <div className="max-w-3xl mx-auto">
