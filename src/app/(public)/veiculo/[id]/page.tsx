@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatKm } from '@/types'
 import Image from 'next/image'
 import Footer from '@/components/Footer'
+import SOSButton from '@/components/public/SOSButton'
 
 export default async function VeiculoPublicoPage({
   params,
@@ -24,6 +25,12 @@ export default async function VeiculoPublicoPage({
 
   return (
     <div className="min-h-screen" style={{ background: '#f0f4fa' }}>
+      {/* Botão SOS */}
+      <SOSButton
+        veiculoId={veiculo.id}
+        veiculoNome={`Frota ${veiculo.numeroFrota} - ${veiculo.modelo}`}
+      />
+
       {/* Marca d'água: foto do veículo como background fullscreen */}
       {veiculo.fotoUrl && (
         <div className="fixed inset-0 z-[-1] overflow-hidden">

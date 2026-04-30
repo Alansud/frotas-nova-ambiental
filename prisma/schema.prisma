@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model Veiculo {
@@ -24,6 +24,7 @@ model Veiculo {
   updatedAt          DateTime        @updatedAt
   manutencoes        Manutencao[]
   proximaRevisao     ProximaRevisao?
+  sosAlertas         SosAlerta[]
 }
 
 model Manutencao {
@@ -53,4 +54,21 @@ model Admin {
   id       String @id @default(cuid())
   email    String @unique
   password String
+}
+
+model SosAlerta {
+  id          String   @id @default(cuid())
+  veiculoId   String
+  veiculo     Veiculo  @relation(fields: [veiculoId], references: [id], onDelete: Cascade)
+  fotoUrl     String?
+  descricao   String
+  latitude    Float?
+  longitude   Float?
+  contato     String?
+  status      String   @default("pendente")
+  createdAt   DateTime @default(now())
+  resolvidoAt DateTime?
+
+  @@index([status])
+  @@index([veiculoId])
 }

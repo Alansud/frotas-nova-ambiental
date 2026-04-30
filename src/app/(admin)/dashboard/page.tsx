@@ -3,6 +3,7 @@ import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatMedi
 import Link from 'next/link'
 import FrotaQRCodeModal from '../veiculos/FrotaQRCodeModal'
 import DashboardCharts from '@/components/DashboardCharts'
+import SOSAlertsSection from '@/components/SOSAlertsSection'
 
 export default async function DashboardPage() {
   const veiculos = await prisma.veiculo.findMany({
@@ -157,6 +158,9 @@ export default async function DashboardPage() {
         </Link>
         <FrotaQRCodeModal />
       </div>
+
+      {/* Alertas SOS - Componente Client-Side com polling */}
+      <SOSAlertsSection />
 
       {/* Gráficos */}
       <DashboardCharts gastosMensais={gastosMensais} tiposServico={tiposServico} />
