@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import Footer from '@/components/Footer'
-import SOSButton from '@/components/public/SOSButton'
 
 interface Veiculo {
   id: string

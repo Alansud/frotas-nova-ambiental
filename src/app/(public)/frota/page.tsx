@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import FrotaListaClient from './FrotaListaClient'
+import SOSButton from '@/components/SOSButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,5 +24,10 @@ export default async function FrotaPage() {
     orderBy: { numeroFrota: 'asc' },
   })
 
-  return <FrotaListaClient veiculos={veiculos} />
+  return (
+    <>
+      <FrotaListaClient veiculos={veiculos} />
+      <SOSButton />
+    </>
+  )
 }
