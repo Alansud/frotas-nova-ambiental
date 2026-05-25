@@ -33,7 +33,7 @@ export default function NavbarAdmin() {
             {/* Desktop nav links */}
             <div className="hidden sm:flex items-center gap-4 text-sm mr-2">
               <a href="/dashboard" className="hover:text-blue-200 transition-colors">
-                Dashboard
+                Página Inicial
               </a>
               <a href="/veiculos" className="hover:text-blue-200 transition-colors">
                 Frotas
@@ -71,7 +71,7 @@ export default function NavbarAdmin() {
         <div className="sm:hidden border-t border-blue-700" style={{ background: '#004a8f' }}>
           <div className="px-4 py-2 space-y-1">
             <a href="/dashboard" className="flex items-center py-3 px-3 rounded-lg text-white hover:bg-white/10 text-sm font-medium min-h-[44px]" onClick={() => setMenuOpen(false)}>
-              Dashboard
+              Página Inicial
             </a>
             <a href="/veiculos" className="flex items-center py-3 px-3 rounded-lg text-white hover:bg-white/10 text-sm font-medium min-h-[44px]" onClick={() => setMenuOpen(false)}>
               Frotas
