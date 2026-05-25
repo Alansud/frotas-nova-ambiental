@@ -4,7 +4,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 
-const FrotaQRCodeModal = dynamic(() => import('./FrotaQRCodeModal'), { ssr: false })
+export const revalidate = 60
+
+const FrotaQRCodeModal = dynamic(() => import('./FrotaQRCodeModal'))
 
 export default async function VeiculosPage() {
   const veiculos = await prisma.veiculo.findMany({

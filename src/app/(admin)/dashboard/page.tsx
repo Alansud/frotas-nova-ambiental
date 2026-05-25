@@ -3,9 +3,11 @@ import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatMedi
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 
-const FrotaQRCodeModal = dynamic(() => import('../veiculos/FrotaQRCodeModal'), { ssr: false })
-const DashboardCharts = dynamic(() => import('@/components/DashboardCharts'), { ssr: false })
-const SOSAlertsSection = dynamic(() => import('@/components/SOSAlertsSection'), { ssr: false })
+export const revalidate = 60
+
+const FrotaQRCodeModal = dynamic(() => import('../veiculos/FrotaQRCodeModal'))
+const DashboardCharts = dynamic(() => import('@/components/DashboardCharts'))
+const SOSAlertsSection = dynamic(() => import('@/components/SOSAlertsSection'))
 
 export default async function DashboardPage() {
   const veiculos = await prisma.veiculo.findMany({

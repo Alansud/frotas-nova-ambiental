@@ -1,7 +1,7 @@
 // Nova Ambiental Frotas — Service Worker
 // Responsável por: cache offline + suporte a notificações push
 
-const CACHE_NAME = 'nova-ambiental-v1'
+const CACHE_NAME = 'nova-ambiental-v2'
 
 // Páginas e assets estáticos a serem cacheados no install
 const STATIC_URLS = [

@@ -40,8 +40,6 @@ export default function FrotaListaClient({ veiculos }: Props) {
 
   return (
     <div className="min-h-screen" style={{ background: '#f0f4fa' }}>
-      {/* Botão SOS Geral */}
-      <SOSButton />
 
       {/* Header */}
       <div className="text-white py-6 px-4 shadow-md" style={{ background: '#0056A6' }}>

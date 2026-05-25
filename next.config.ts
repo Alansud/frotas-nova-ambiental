@@ -5,20 +5,19 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   compress: true,
+  poweredByHeader: false,
   // Permite origens de desenvolvimento locais (ignorado em produção)
   ...(process.env.NODE_ENV === "development" && {
     allowedDevOrigins: ["192.168.1.7"],
   }),
   images: {
     formats: ['image/webp'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-    ],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  // Otimização de imports para bibliotecas pesadas
+  experimental: {
+    optimizePackageImports: ['recharts'],
   },
   // Módulos nativos precisam ser tratados como externos no servidor
   serverExternalPackages: [
@@ -27,6 +26,7 @@ const nextConfig: NextConfig = {
     "pg",
     "bcryptjs",
     "@react-pdf/renderer",
+    "sharp",
   ],
   async headers() {
     return [
@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
         source: '/api/alertas',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=60, stale-while-revalidate=300' },
+        ],
+      },
+      {
+        source: '/api/veiculos',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=30, stale-while-revalidate=120' },
         ],
       },
     ]

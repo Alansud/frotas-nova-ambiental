@@ -6,7 +6,9 @@ import ReviewAlertToast from '@/components/admin/ReviewAlertToast'
 import AlertToast from '@/components/AlertToast'
 import NavbarAdmin from '@/components/admin/NavbarAdmin'
 import Footer from '@/components/Footer'
-import PushNotifications from '@/components/PushNotifications'
+import dynamic from 'next/dynamic'
+
+const PushNotifications = dynamic(() => import('@/components/PushNotifications'))
 
 export default async function AdminLayout({
   children,

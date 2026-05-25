@@ -5,7 +5,27 @@ import { auth } from '@/lib/auth'
 export async function GET() {
   const veiculos = await prisma.veiculo.findMany({
     where: { ativo: true },
-    include: { manutencoes: { orderBy: { data: 'desc' }, take: 1 }, proximaRevisao: true },
+    select: {
+      id: true,
+      numeroFrota: true,
+      placa: true,
+      modelo: true,
+      marca: true,
+      ano: true,
+      cor: true,
+      fotoUrl: true,
+      kmAtual: true,
+      tipoMedicao: true,
+      createdAt: true,
+      manutencoes: {
+        orderBy: { data: 'desc' },
+        take: 1,
+        select: { id: true, data: true, servicos: true, custo: true },
+      },
+      proximaRevisao: {
+        select: { kmPrevisto: true, dataPrevista: true, observacoes: true },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   })
   return NextResponse.json(veiculos)

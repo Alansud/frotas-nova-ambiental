@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import sharp from 'sharp'
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -17,15 +18,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Tipo de arquivo não permitido' }, { status: 400 })
   }
 
-  // Limite de 2MB
-  if (file.size > 2 * 1024 * 1024) {
-    return NextResponse.json({ error: 'Arquivo muito grande (máx 2MB)' }, { status: 400 })
+  // Limite de 10MB antes de comprimir
+  if (file.size > 10 * 1024 * 1024) {
+    return NextResponse.json({ error: 'Arquivo muito grande (máx 10MB)' }, { status: 400 })
   }
 
   try {
     const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const base64 = `data:${file.type};base64,${buffer.toString('base64')}`
+    const inputBuffer = Buffer.from(bytes)
+
+    // Comprimir: redimensionar para no máximo 800px, qualidade 65%, converter para webp
+    const compressedBuffer = await sharp(inputBuffer)
+      .resize(800, 800, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .webp({ quality: 65 })
+      .toBuffer()
+
+    const base64 = `data:image/webp;base64,${compressedBuffer.toString('base64')}`
 
     return NextResponse.json({ url: base64 })
   } catch (error: unknown) {
