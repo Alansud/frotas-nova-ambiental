@@ -24,8 +24,21 @@ function checkRateLimit(ip: string): boolean {
   return true
 }
 
+// Limpeza periódica do rate limit para evitar memory leak
+function cleanupRateLimit() {
+  const now = Date.now()
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now > record.resetTime) {
+      rateLimitMap.delete(ip)
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Limpar entradas expiradas a cada 100 requisições (aproximadamente)
+    if (rateLimitMap.size > 100) cleanupRateLimit()
+
     // Obter IP do cliente
     const forwardedFor = request.headers.get('x-forwarded-for')
     const ip = forwardedFor?.split(',')[0]?.trim() || 'unknown'

@@ -3,6 +3,7 @@ import FrotaListaClient from './FrotaListaClient'
 import SOSButton from '@/components/SOSButton'
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export const metadata = {
   title: 'Frota Nova Ambiental — Consulta de Revisões',

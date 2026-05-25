@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from 'recharts'
+import { memo } from 'react'
 
 export interface GastoMensal {
   mes: string
@@ -23,7 +24,7 @@ interface Props {
 
 const PIE_COLORS = ['#0056A6', '#00A651', '#f59e0b', '#ef4444', '#8b5cf6']
 
-export default function DashboardCharts({ gastosMensais, tiposServico }: Props) {
+function DashboardCharts({ gastosMensais, tiposServico }: Props) {
   const temGastos = gastosMensais.some(g => g.total > 0 || g.count > 0)
 
   return (
@@ -109,3 +110,5 @@ export default function DashboardCharts({ gastosMensais, tiposServico }: Props) 
     </div>
   )
 }
+
+export default memo(DashboardCharts)

@@ -2,12 +2,30 @@ import { prisma } from '@/lib/prisma'
 import { calcularStatusRevisao, statusLabel, statusColor, formatKm } from '@/types'
 import Link from 'next/link'
 import Image from 'next/image'
-import FrotaQRCodeModal from './FrotaQRCodeModal'
+import dynamic from 'next/dynamic'
+
+const FrotaQRCodeModal = dynamic(() => import('./FrotaQRCodeModal'), { ssr: false })
 
 export default async function VeiculosPage() {
   const veiculos = await prisma.veiculo.findMany({
     where: { ativo: true },
-    include: { manutencoes: true, proximaRevisao: true },
+    select: {
+      id: true,
+      numeroFrota: true,
+      placa: true,
+      modelo: true,
+      marca: true,
+      ano: true,
+      fotoUrl: true,
+      kmAtual: true,
+      tipoMedicao: true,
+      proximaRevisao: {
+        select: {
+          kmPrevisto: true,
+          dataPrevista: true,
+        },
+      },
+    },
     orderBy: { numeroFrota: 'asc' },
   })
 

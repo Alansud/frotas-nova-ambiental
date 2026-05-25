@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Tipo de arquivo não permitido' }, { status: 400 })
   }
 
-  // Limite de 5MB
-  if (file.size > 5 * 1024 * 1024) {
-    return NextResponse.json({ error: 'Arquivo muito grande (máx 5MB)' }, { status: 400 })
+  // Limite de 2MB
+  if (file.size > 2 * 1024 * 1024) {
+    return NextResponse.json({ error: 'Arquivo muito grande (máx 2MB)' }, { status: 400 })
   }
 
   try {

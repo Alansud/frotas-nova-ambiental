@@ -1,9 +1,12 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
-import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatKm } from '@/types'
+import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatKm, formatMedicao } from '@/types'
 import Image from 'next/image'
 import Footer from '@/components/Footer'
 import SOSButton from '@/components/SOSButton'
+import AtualizarKmForm from './AtualizarKmForm'
+
+export const revalidate = 60
 
 export default async function VeiculoPublicoPage({
   params,
@@ -83,11 +86,24 @@ export default async function VeiculoPublicoPage({
                 {statusLabel(status)}
               </span>
             </div>
-            <div className="mt-3 pt-3 border-t border-gray-50 text-sm text-gray-600">
-              <span className="font-medium">KM Atual: </span>{formatKm(veiculo.kmAtual)}
+            {/* KM Atual destacado */}
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
+                {veiculo.tipoMedicao === 'hora' ? 'Horas Atuais' : 'KM Atual'}
+              </p>
+              <p className="text-3xl font-bold" style={{ color: '#0056A6' }}>
+                {formatMedicao(veiculo.kmAtual, veiculo.tipoMedicao)}
+              </p>
             </div>
           </div>
         </div>
+
+        {/* Formulário de atualização de KM */}
+        <AtualizarKmForm
+          veiculoId={veiculo.id}
+          kmAtual={veiculo.kmAtual}
+          tipoMedicao={veiculo.tipoMedicao}
+        />
 
         {/* Proxima revisao */}
         {veiculo.proximaRevisao && (

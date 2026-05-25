@@ -18,12 +18,22 @@ export default async function AdminLayout({
 
   const veiculos = await prisma.veiculo.findMany({
     where: { ativo: true },
-    include: { manutencoes: true, proximaRevisao: true },
+    select: {
+      id: true,
+      kmAtual: true,
+      tipoMedicao: true,
+      proximaRevisao: {
+        select: {
+          kmPrevisto: true,
+          dataPrevista: true,
+        },
+      },
+    },
   })
 
   const notificacoes = veiculos.reduce(
     (acc, veiculo) => {
-      const status = calcularStatusRevisao(veiculo)
+      const status = calcularStatusRevisao(veiculo as unknown as import('@/types').VeiculoComRelacoes)
       if (status === 'vencida') acc.vencidas += 1
       if (status === 'atencao') acc.proximas += 1
       return acc

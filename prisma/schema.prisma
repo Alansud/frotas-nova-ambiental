@@ -25,6 +25,10 @@ model Veiculo {
   manutencoes        Manutencao[]
   proximaRevisao     ProximaRevisao?
   sosAlertas         SosAlerta[]
+
+  @@index([ativo])
+  @@index([ativo, createdAt])
+  @@index([ativo, numeroFrota])
 }
 
 model Manutencao {
@@ -38,6 +42,10 @@ model Manutencao {
   observacoes String?
   custo       Float?
   createdAt   DateTime @default(now())
+
+  @@index([veiculoId])
+  @@index([veiculoId, data])
+  @@index([createdAt])
 }
 
 model ProximaRevisao {

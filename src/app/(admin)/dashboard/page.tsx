@@ -1,14 +1,37 @@
 import { prisma } from '@/lib/prisma'
 import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatMedicao } from '@/types'
 import Link from 'next/link'
-import FrotaQRCodeModal from '../veiculos/FrotaQRCodeModal'
-import DashboardCharts from '@/components/DashboardCharts'
-import SOSAlertsSection from '@/components/SOSAlertsSection'
+import dynamic from 'next/dynamic'
+
+const FrotaQRCodeModal = dynamic(() => import('../veiculos/FrotaQRCodeModal'), { ssr: false })
+const DashboardCharts = dynamic(() => import('@/components/DashboardCharts'), { ssr: false })
+const SOSAlertsSection = dynamic(() => import('@/components/SOSAlertsSection'), { ssr: false })
 
 export default async function DashboardPage() {
   const veiculos = await prisma.veiculo.findMany({
     where: { ativo: true },
-    include: { manutencoes: true, proximaRevisao: true },
+    select: {
+      id: true,
+      numeroFrota: true,
+      placa: true,
+      modelo: true,
+      marca: true,
+      ano: true,
+      cor: true,
+      renavam: true,
+      chassi: true,
+      fotoUrl: true,
+      kmAtual: true,
+      tipoMedicao: true,
+      createdAt: true,
+      proximaRevisao: {
+        select: {
+          kmPrevisto: true,
+          dataPrevista: true,
+          observacoes: true,
+        },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   })
 
@@ -22,19 +45,19 @@ export default async function DashboardPage() {
 
   const statusCounts = { ok: 0, atencao: 0, vencida: 0, 'sem-previsao': 0 }
   for (const v of veiculos) {
-    statusCounts[calcularStatusRevisao(v)]++
+    statusCounts[calcularStatusRevisao(v as unknown as import('@/types').VeiculoComRelacoes)]++
   }
 
   const alertaTotal = statusCounts.vencida + statusCounts.atencao
 
   const veiculosAlerta = veiculos
     .filter(v => {
-      const s = calcularStatusRevisao(v)
+      const s = calcularStatusRevisao(v as unknown as import('@/types').VeiculoComRelacoes)
       return s === 'vencida' || s === 'atencao'
     })
     .sort((a, b) => {
-      const sa = calcularStatusRevisao(a)
-      const sb = calcularStatusRevisao(b)
+      const sa = calcularStatusRevisao(a as unknown as import('@/types').VeiculoComRelacoes)
+      const sb = calcularStatusRevisao(b as unknown as import('@/types').VeiculoComRelacoes)
       if (sa === 'vencida' && sb !== 'vencida') return -1
       if (sb === 'vencida' && sa !== 'vencida') return 1
       return 0
@@ -178,7 +201,7 @@ export default async function DashboardPage() {
           </div>
           <div className="space-y-3">
             {veiculosAlerta.map(v => {
-              const status = calcularStatusRevisao(v)
+              const status = calcularStatusRevisao(v as unknown as import('@/types').VeiculoComRelacoes)
               return (
                 <div key={v.id} className={`flex items-center justify-between py-3 px-4 rounded-lg border ${
                   status === 'vencida' ? 'bg-red-50 border-red-100' : 'bg-yellow-50 border-yellow-100'
