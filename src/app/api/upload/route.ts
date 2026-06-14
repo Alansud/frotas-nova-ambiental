@@ -18,9 +18,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Tipo de arquivo não permitido' }, { status: 400 })
   }
 
-  // Limite de 10MB antes de comprimir
-  if (file.size > 10 * 1024 * 1024) {
-    return NextResponse.json({ error: 'Arquivo muito grande (máx 10MB)' }, { status: 400 })
+  // Limite de 5MB — Netlify Functions têm teto de 6MB no API Gateway
+  if (file.size > 5 * 1024 * 1024) {
+    return NextResponse.json({ error: 'Arquivo muito grande (máx 5MB)' }, { status: 400 })
   }
 
   try {

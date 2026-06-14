@@ -3,8 +3,6 @@ import { calcularStatusRevisao, statusLabel, statusColor, formatDate, formatMedi
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 
-export const revalidate = 60
-
 const FrotaQRCodeModal = dynamic(() => import('../veiculos/FrotaQRCodeModal'))
 const DashboardCharts = dynamic(() => import('@/components/DashboardCharts'))
 const SOSAlertsSection = dynamic(() => import('@/components/SOSAlertsSection'))

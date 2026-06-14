@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
     formats: ['image/webp'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    remotePatterns: [
+      // Retrocompatibilidade: veículos cadastrados antes da migração para base64
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
+    ],
   },
   // Otimização de imports para bibliotecas pesadas
   experimental: {

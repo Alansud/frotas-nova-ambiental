@@ -4,8 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 
-export const revalidate = 60
-
 const FrotaQRCodeModal = dynamic(() => import('./FrotaQRCodeModal'))
 
 export default async function VeiculosPage() {
