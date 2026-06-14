@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  compress: true,
+  // Netlify CDN comprime os assets — compress no servidor gera overhead desnecessário
+  compress: process.env.NETLIFY !== 'true',
   poweredByHeader: false,
   // Permite origens de desenvolvimento locais (ignorado em produção)
   ...(process.env.NODE_ENV === "development" && {

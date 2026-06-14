@@ -1,0 +1,17 @@
+# ============================================================
+# Netlify — Nova Ambiental Frotas
+# Documentação: https://docs.netlify.com/frameworks/next-js/
+# ============================================================
+
+[build]
+  command   = "npm run build"
+  publish   = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Inclui optional deps (better-sqlite3 — só usado localmente)
+  NPM_FLAGS = "--include=optional"
+
+# Plugin oficial para Next.js App Router (SSR, ISR, Image Opt, API Routes)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
